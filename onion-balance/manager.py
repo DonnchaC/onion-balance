@@ -78,7 +78,15 @@ def main():
     logger.setLevel(logging.__dict__[args.verbosity.upper()])
 
     # Create a connection to the Tor control port
-    controller = Controller.from_port(address=args.ip, port=args.port)
+    try:
+        controller = Controller.from_port(address=args.ip, port=args.port)
+    except stem.SocketError as exc:
+        logger.error("Unable to connect to Tor control port: %s"
+                     % exc)
+        sys.exit(1)
+    else:
+        logger.debug("Successfully connected to the Tor control port")
+
     try:
         controller.authenticate()
     except stem.connection.AuthenticationFailure as exc:
@@ -86,7 +94,7 @@ def main():
                      % exc)
         sys.exit(1)
     else:
-        logger.debug("Successfully connected to the Tor control port")
+        logger.debug("Successfully authenticated to the Tor control port")
 
     # Load the keys and configuration for each hidden service
     for service in config.cfg.config.get("services"):
