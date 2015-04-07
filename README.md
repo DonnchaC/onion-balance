@@ -67,6 +67,7 @@ be install using pip.
     $ pip install -r requirements.txt
 
 For onion service descriptor parsing you need a version of stem >= `1.3.0-dev`.
+
     $ git clone https://git.torproject.org/stem.git
     $ sudo python stem/setup.py install
 
