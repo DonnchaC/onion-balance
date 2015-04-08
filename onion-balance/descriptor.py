@@ -211,5 +211,5 @@ def upload_descriptor(controller, signed_descriptor, hsdirs=None):
         if response_code == "552":
             raise stem.InvalidRequest(response_code, response_content)
         else:
-            raise stem.ProtocolError("+HSPOST returned unexpected response "
+            raise stem.ProtocolError("HSPOST returned unexpected response "
                                      "code: %s" % response_code)
