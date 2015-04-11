@@ -78,7 +78,15 @@ def main():
     logger.setLevel(logging.__dict__[args.verbosity.upper()])
 
     # Create a connection to the Tor control port
-    controller = Controller.from_port(address=args.ip, port=args.port)
+    try:
+        controller = Controller.from_port(address=args.ip, port=args.port)
+    except stem.SocketError as exc:
+        logger.error("Unable to connect to Tor control port: %s"
+                     % exc)
+        sys.exit(1)
+    else:
+        logger.debug("Successfully connected to the Tor control port")
+
     try:
         controller.authenticate()
     except stem.connection.AuthenticationFailure as exc:
@@ -86,7 +94,7 @@ def main():
                      % exc)
         sys.exit(1)
     else:
-        logger.debug("Successfully connected to the Tor control port")
+        logger.debug("Successfully authenticated to the Tor control port")
 
     # Load the keys and configuration for each hidden service
     for service in config.cfg.config.get("services"):
@@ -110,9 +118,20 @@ def main():
         else:
             instances = []
             for instance in instance_config:
+                service_privkey= util.key_decrypt_prompt(instance.get("key"))
+                if not service_privkey:
+                    logger.error("Private key could not be imported (%s)" %
+                                 args.key)
+                    sys.exit(0)
+                else:
+                    # Successfully import the private key
+                    onion_address = util.calc_onion_address(service_privkey)
+                    logger.debug("Loaded private key for service '%s'" %
+                                onion_address)
                 instances.append(hiddenservice.Instance(
                     controller=controller,
-                    onion_address=instance.get("address"),
+                    service_privkey=service_privkey, # FIXME Just full key
+                    onion_address=onion_address,
                     authentication_cookie=instance.get("auth")
                 ))
 
@@ -127,6 +146,7 @@ def main():
     # Finished parsing all the config file.
 
     handler = eventhandler.EventHandler(controller)
+    
     controller.add_event_listener(handler.new_event,
                                   EventType.HS_DESC,
                                   EventType.HS_DESC_CONTENT)

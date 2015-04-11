@@ -48,6 +48,7 @@ and upload HS descriptors. Until these features are merged into Tor, you can
 use my patched Tor branch.
 
     $ git clone https://github.com/DonnchaC/tor.git
+    $ cd tor
     $ git checkout hs-fetch-and-post-cmds
 
 The `docs/torrc` contains a sample Tor config file which is suitable for the
@@ -66,6 +67,9 @@ be install using pip.
     $ pip install -r requirements.txt
 
 For onion service descriptor parsing you need a version of stem >= `1.3.0-dev`.
+
+    $ git clone https://git.torproject.org/stem.git
+    $ sudo python stem/setup.py install
 
 ## Configuration
 

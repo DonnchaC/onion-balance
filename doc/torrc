@@ -1,3 +1,4 @@
+ControlPort 9052
 CookieAuthentication 1
 FetchDirInfoEarly 1
 FetchDirInfoExtraEarly 1

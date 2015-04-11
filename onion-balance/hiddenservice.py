@@ -143,6 +143,7 @@ class HiddenService(object):
             len(combined_intro_points),
             config.cfg.config.get("max_intro_points")
         )
+	#print [ip.service_key for ip in combined_intro_points]
 
         choosen_intro_points = random.sample(combined_intro_points,
                                              max_introduction_points)
@@ -215,11 +216,12 @@ class Instance(object):
     Instance represents a back-end load balancing hidden service.
     """
 
-    def __init__(self, controller, onion_address, authentication_cookie):
+    def __init__(self, controller, service_privkey, onion_address, authentication_cookie):
         """
         Initialise an Instance object.
         """
         self.controller = controller
+        self.service_privkey = service_privkey
         self.onion_address = onion_address
         self.authentication_cookie = authentication_cookie
 
@@ -244,17 +246,19 @@ class Instance(object):
         """
 
         logger.info("Received a descriptor for %s" % self.onion_address)
+        #print descriptor_content
+
 
         self.last_fetched = datetime.datetime.utcnow()
 
         # Parse and store this descriptors introduction points.
         parsed_descriptor = stem.descriptor.hidden_service_descriptor.\
             HiddenServiceDescriptor(descriptor_content)
-
+        #print parsed_descriptor
         # Parse the introduction point list, decrypting if necessary
         introduction_points = parsed_descriptor.introduction_points(
             authentication_cookie=self.authentication_cookie)
-
+        print introduction_points
         # If the new intro point set is different, flag this HS instance
         # as modified.
         if introduction_points != self.introduction_points:

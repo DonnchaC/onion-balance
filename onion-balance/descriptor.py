@@ -9,6 +9,7 @@ import stem
 
 import util
 import log
+import sys
 
 logger = log.get_logger()
 
@@ -97,6 +98,8 @@ def make_introduction_points_part(introduction_point_list=None):
         intro.append(intro_point.onion_key)
         intro.append("service-key")
         intro.append(intro_point.service_key)
+        intro.append("service-perm-signature")
+        intro.append(intro_point.service_perm_signature)
 
     intro_section = '\n'.join(intro).encode('utf-8')
     intro_section_base64 = base64.b64encode(intro_section).decode('utf-8')
@@ -165,6 +168,16 @@ def sign_descriptor(descriptor, service_key):
     signature_with_headers = sign_digest(descriptor_digest, service_key)
     return descriptor + signature_with_headers
 
+def sign_permkey(permanent_key, service_key):
+    """
+    Sign a provided hidden service permanent key with the service_key
+    """
+    public_permanent_key = make_public_key_block(permanent_key)
+    perm_key_digest = hashlib.sha1(public_permanent_key.encode('utf-8')).digest()
+    signature_with_headers = sign_digest(perm_key_digest, service_key)
+    print signature_with_headers
+    return signature_with_headers
+
 
 def fetch_descriptor(controller, onion_address, hsdir=None):
     """
@@ -176,6 +189,9 @@ def fetch_descriptor(controller, onion_address, hsdir=None):
     response = controller.msg("HSFETCH %s" % (onion_address))
     (response_code, divider, response_content) = response.content()[0]
     if not response.is_ok():
+        if response_code == "510":
+            logger.error("This version of Tor does not support HSFETCH command")
+            sys.exit(1)
         if response_code == "552":
             raise stem.InvalidRequest(response_code, response_content)
         else:
@@ -207,5 +223,5 @@ def upload_descriptor(controller, signed_descriptor, hsdirs=None):
         if response_code == "552":
             raise stem.InvalidRequest(response_code, response_content)
         else:
-            raise stem.ProtocolError("+HSPOST returned unexpected response "
+            raise stem.ProtocolError("HSPOST returned unexpected response "
                                      "code: %s" % response_code)
