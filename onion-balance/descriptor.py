@@ -98,6 +98,8 @@ def make_introduction_points_part(introduction_point_list=None):
         intro.append(intro_point.onion_key)
         intro.append("service-key")
         intro.append(intro_point.service_key)
+        intro.append("service-perm-signature")
+        intro.append(intro_point.service_perm_signature)
 
     intro_section = '\n'.join(intro).encode('utf-8')
     intro_section_base64 = base64.b64encode(intro_section).decode('utf-8')
@@ -165,6 +167,23 @@ def sign_descriptor(descriptor, service_key):
     descriptor_digest = hashlib.sha1(descriptor.encode('utf-8')).digest()
     signature_with_headers = sign_digest(descriptor_digest, service_key)
     return descriptor + signature_with_headers
+
+def sign_permkey(perm_key, service_key):
+    """
+    Sign a provided hidden service permanent key with the service_key
+    """
+#    TOKEN_HSPERMK_SIGNATURE = '\nservice-perm-signature\n'
+
+    # Remove signature block if it exists
+#    if TOKEN_HSPERMK_SIGNATURE in permkey:
+#        descriptor = descriptor[:descriptor.find(TOKEN_HSDESCRIPTOR_SIGNATURE)
+#                                + len(TOKEN_HSDESCRIPTOR_SIGNATURE)]
+#    else:
+#        descriptor = descriptor.strip() + TOKEN_HSDESCRIPTOR_SIGNATURE
+
+    perm_key_digest = hashlib.sha1(perm_key.encode('utf-8')).digest()
+    signature_with_headers = sign_digest(perm_key_digest, service_key)
+    return signature_with_headers
 
 
 def fetch_descriptor(controller, onion_address, hsdir=None):
