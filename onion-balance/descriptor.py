@@ -168,21 +168,14 @@ def sign_descriptor(descriptor, service_key):
     signature_with_headers = sign_digest(descriptor_digest, service_key)
     return descriptor + signature_with_headers
 
-def sign_permkey(perm_key, service_key):
+def sign_permkey(permanent_key, service_key):
     """
     Sign a provided hidden service permanent key with the service_key
     """
-#    TOKEN_HSPERMK_SIGNATURE = '\nservice-perm-signature\n'
-
-    # Remove signature block if it exists
-#    if TOKEN_HSPERMK_SIGNATURE in permkey:
-#        descriptor = descriptor[:descriptor.find(TOKEN_HSDESCRIPTOR_SIGNATURE)
-#                                + len(TOKEN_HSDESCRIPTOR_SIGNATURE)]
-#    else:
-#        descriptor = descriptor.strip() + TOKEN_HSDESCRIPTOR_SIGNATURE
-
-    perm_key_digest = hashlib.sha1(perm_key.encode('utf-8')).digest()
+    public_permanent_key = make_public_key_block(permanent_key)
+    perm_key_digest = hashlib.sha1(public_permanent_key.encode('utf-8')).digest()
     signature_with_headers = sign_digest(perm_key_digest, service_key)
+    print signature_with_headers
     return signature_with_headers
 
 

@@ -118,9 +118,20 @@ def main():
         else:
             instances = []
             for instance in instance_config:
+                service_privkey= util.key_decrypt_prompt(instance.get("key"))
+                if not service_privkey:
+                    logger.error("Private key could not be imported (%s)" %
+                                 args.key)
+                    sys.exit(0)
+                else:
+                    # Successfully import the private key
+                    onion_address = util.calc_onion_address(service_privkey)
+                    logger.debug("Loaded private key for service '%s'" %
+                                onion_address)
                 instances.append(hiddenservice.Instance(
                     controller=controller,
-                    onion_address=instance.get("address"),
+                    service_privkey=service_privkey, # FIXME Just full key
+                    onion_address=onion_address,
                     authentication_cookie=instance.get("auth")
                 ))
 
@@ -135,6 +146,7 @@ def main():
     # Finished parsing all the config file.
 
     handler = eventhandler.EventHandler(controller)
+    
     controller.add_event_listener(handler.new_event,
                                   EventType.HS_DESC,
                                   EventType.HS_DESC_CONTENT)
