@@ -51,7 +51,7 @@ use my patched Tor branch.
     $ cd tor
     $ git checkout hs-fetch-and-post-cmds
 
-The `docs/torrc` contains a sample Tor config file which is suitable for the
+The `doc/torrc` contains a sample Tor config file which is suitable for the
 management server.
 
 ##### Install the management server
