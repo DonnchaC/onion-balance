@@ -29,8 +29,10 @@ def choose_introduction_point_set(available_introduction_points):
     Return a list of IntroductionPoints.
     """
 
-    # Shuffle the instance order before beginning to pick intro points
-    random.shuffle(available_introduction_points)
+    # Shuffle intro points order for each instance before beginning
+    # to pick right intro points
+    for ip_group in available_introduction_points:
+        random.shuffle(ip_group)
 
     num_active_instances = len(available_introduction_points)
     ips_per_instance = [len(ips) for ips in available_introduction_points]
