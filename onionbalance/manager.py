@@ -22,6 +22,7 @@ from onionbalance import eventhandler
 
 import onionbalance.service
 import onionbalance.instance
+from onionbalance import __version__
 
 logger = log.get_logger()
 
@@ -87,6 +88,7 @@ def main():
             setattr(config, setting, config_file_options.get(setting))
 
     logger.setLevel(logging.__dict__[args.verbosity.upper()])
+    logger.info("Starting OnionBalance v. %s", __version__)
 
     # Create a connection to the Tor control port
     try:
