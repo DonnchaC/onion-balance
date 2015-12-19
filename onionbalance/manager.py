@@ -4,6 +4,7 @@ Load balance a hidden service across multiple (remote) Tor instances by
 create a hidden service descriptor containing introduction points from
 each instance.
 """
+import signal
 import sys
 import argparse
 import time
@@ -23,6 +24,20 @@ import onionbalance.service
 import onionbalance.instance
 
 logger = log.get_logger()
+
+
+def handle_sigint_sigterm(signum, frame):
+    """Handle SIGINT (Ctrl-C) and SIGTERM"""
+    logger.info("Signal %d received, exiting", signum)
+    handle_sigint_sigterm.__tor_controller.close()
+    logging.shutdown()
+    sys.exit(0)
+
+
+def setup_signal_handler(controller):
+    handle_sigint_sigterm.__tor_controller = controller
+    signal.signal(signal.SIGTERM, handle_sigint_sigterm)
+    signal.signal(signal.SIGINT, handle_sigint_sigterm)
 
 
 def parse_cmd_args():
@@ -82,6 +97,8 @@ def main():
     else:
         logger.debug("Successfully connected to the Tor control port.")
 
+    setup_signal_handler(controller)
+
     try:
         controller.authenticate()
     except stem.connection.AuthenticationFailure as exc:
@@ -119,15 +136,12 @@ def main():
     schedule.every(config.PUBLISH_CHECK_INTERVAL).seconds.do(
         onionbalance.service.publish_all_descriptors)
 
-    try:
-        # Run initial fetch of HS instance descriptors
-        schedule.run_all(delay_seconds=30)
+    # Run initial fetch of HS instance descriptors
+    schedule.run_all(delay_seconds=30)
 
-        # Begin main loop to poll for HS descriptors
-        while True:
-            schedule.run_pending()
-            time.sleep(1)
-    except KeyboardInterrupt:
-        logger.info("Keyboard interrupt received. Stopping the "
-                    "management server.")
+    # Begin main loop to poll for HS descriptors
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
     return 0
