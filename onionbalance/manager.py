@@ -141,7 +141,10 @@ def main():
 
     # Begin main loop to poll for HS descriptors
     while True:
-        schedule.run_pending()
+        try:
+            schedule.run_pending()
+        except Exception:
+            logger.error("Unexpected exception:", exc_info=True)
         time.sleep(1)
 
     return 0
