@@ -114,7 +114,7 @@ def key_decrypt_prompt(key_file, retries=3):
                 continue
             else:
                 # .. todo:: Check the loaded key size in a more reasonable way.
-                if rsa_key.has_private() and rsa_key.size() == (1023 or 1024):
+                if rsa_key.has_private() and rsa_key.size() in (1023, 1024):
                     return rsa_key
                 else:
                     raise ValueError("The specified key was not a 1024 bit "
