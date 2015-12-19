@@ -13,6 +13,7 @@ import logging
 # import Crypto.PublicKey
 import stem
 from stem.control import Controller, EventType
+from setproctitle import setproctitle
 import schedule
 
 from onionbalance import log
@@ -81,6 +82,7 @@ def main():
     """
     args = parse_cmd_args()
     config_file_options = settings.parse_config_file(args.config)
+    setproctitle('onionbalance')
 
     # Update global configuration with options specified in the config file
     for setting in dir(config):
