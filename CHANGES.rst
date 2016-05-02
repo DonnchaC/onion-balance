@@ -1,3 +1,8 @@
+0.1.4
+-----
+
+- Remove the 'schedule' dependency to simplify Debian backporting
+
 0.1.3
 -----
 

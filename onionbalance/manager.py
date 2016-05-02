@@ -12,12 +12,12 @@ import logging
 # import Crypto.PublicKey
 import stem
 from stem.control import Controller, EventType
-import schedule
 
 from onionbalance import log
 from onionbalance import settings
 from onionbalance import config
 from onionbalance import eventhandler
+from onionbalance import scheduler
 from onionbalance import status
 
 import onionbalance.service
@@ -128,19 +128,21 @@ def main():
                                   EventType.HS_DESC_CONTENT)
 
     # Schedule descriptor fetch and upload events
-    schedule.every(config.REFRESH_INTERVAL).seconds.do(
-        onionbalance.instance.fetch_instance_descriptors, controller)
-    schedule.every(config.PUBLISH_CHECK_INTERVAL).seconds.do(
-        onionbalance.service.publish_all_descriptors)
+    scheduler.add_job(config.REFRESH_INTERVAL,
+                      onionbalance.instance.fetch_instance_descriptors,
+                      controller)
+    scheduler.add_job(config.PUBLISH_CHECK_INTERVAL,
+                      onionbalance.service.publish_all_descriptors)
 
-    # Run initial fetch of HS instance descriptors
-    schedule.run_all(delay_seconds=config.INITIAL_DELAY)
+    try:
+        # Run initial fetch of HS instance descriptors
+        scheduler.run_all(delay_seconds=30)
 
-    # Begin main loop to poll for HS descriptors
-    while True:
-        try:
-            schedule.run_pending()
-        except Exception:
-            logger.error("Unexpected exception:", exc_info=True)
+        # Begin main loop to poll for HS descriptors
+        scheduler.run_forever(check_interval=1,
+                              catch_all_exceptions=True)
 
+    except KeyboardInterrupt:
+        logger.info("Keyboard interrupt received. Stopping the "
+                    "management server.")
     return 0
