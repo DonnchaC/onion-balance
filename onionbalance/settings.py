@@ -59,11 +59,15 @@ def initialize_services(controller, services_config):
     for service in services_config:
         try:
             service_key = util.key_decrypt_prompt(service.get("key"))
-        except OSError as e:
+        except (IOError, OSError) as e:
             if e.errno == errno.ENOENT:
                 logger.error("Private key file %s could not be found. "
                              "Relative paths in the config file are loaded "
                              "relative to the config file directory.",
+                             service.get("key"))
+                sys.exit(1)
+            elif e.errno == errno.EACCES:
+                logger.error("Permission denied to private key %s."
                              service.get("key"))
                 sys.exit(1)
             else:
