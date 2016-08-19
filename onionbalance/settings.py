@@ -67,7 +67,7 @@ def initialize_services(controller, services_config):
                              service.get("key"))
                 sys.exit(1)
             elif e.errno == errno.EACCES:
-                logger.error("Permission denied to private key %s."
+                logger.error("Permission denied to private key %s.",
                              service.get("key"))
                 sys.exit(1)
             else:
