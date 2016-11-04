@@ -39,7 +39,7 @@ class Instance(object):
 
         # Onion address for the service instance.
         if onion_address:
-            onion_address = onion_address.strip('.onion')
+            onion_address = onion_address.replace('.onion', '')
         self.onion_address = onion_address
         self.authentication_cookie = authentication_cookie
 
