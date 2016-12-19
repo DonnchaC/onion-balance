@@ -120,7 +120,7 @@ class Service(object):
             if (received_age > config.DESCRIPTOR_UPLOAD_PERIOD or
                     timestamp_age > (4 * 60 * 60)):
                 logger.info("Our descriptor for instance %s.onion is too old. "
-                            "The instance may be offline. It's introduction "
+                            "The instance may be offline. Its introduction "
                             "points will not be included in the master "
                             "descriptor.", instance.onion_address)
                 continue
@@ -234,7 +234,7 @@ class Service(object):
 
     def descriptor_publish(self, force_publish=False):
         """
-        Publish descriptor if have new IP's or if descriptor has expired
+        Publish descriptor if have new IPs or if descriptor has expired
         """
 
         # A descriptor should be published if any of the following conditions

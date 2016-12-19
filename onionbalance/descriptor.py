@@ -276,7 +276,7 @@ def upload_descriptor(controller, signed_descriptor, hsdirs=None):
     """
     Upload descriptor via the Tor control port
 
-    If no HSDir's are specified, Tor will upload to what it thinks are the
+    If no HSDirs are specified, Tor will upload to what it thinks are the
     responsible directories
     """
     logger.debug("Beginning service descriptor upload.")

@@ -50,7 +50,7 @@ class EventHandler(object):
         #  Check that the HSDir returned a descriptor that is not empty
         descriptor_text = str(desc_content_event.descriptor).encode('utf-8')
 
-        # HSDir's provide a HS_DESC_CONTENT response with either one or two
+        # HSDirs provide a HS_DESC_CONTENT response with either one or two
         # CRLF lines when they do not have a matching descriptor. Using
         # len() < 5 should ensure all empty HS_DESC_CONTENT events are matched.
         if len(descriptor_text) < 5:
