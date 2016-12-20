@@ -90,9 +90,11 @@ class Instance(object):
         # descriptors.
         if self.timestamp and parsed_descriptor.published < self.timestamp:
             logger.error("Received descriptor for instance %s.onion with "
-                         "publication timestamp older than the latest "
-                         "descriptor. Ignoring the descriptor.",
-                         self.onion_address)
+                         "publication timestamp (%s) older than the latest "
+                         "descriptor (%s). Ignoring the descriptor.",
+                         self.onion_address,
+                         parsed_descriptor.published,
+                         self.timestamp)
             return
         else:
             self.timestamp = parsed_descriptor.published

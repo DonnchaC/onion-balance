@@ -117,12 +117,23 @@ class Service(object):
             received_age = received_age.total_seconds()
             timestamp_age = timestamp_age.total_seconds()
 
-            if (received_age > config.DESCRIPTOR_UPLOAD_PERIOD or
-                    timestamp_age > (4 * 60 * 60)):
-                logger.info("Our descriptor for instance %s.onion is too old. "
+            if received_age > config.DESCRIPTOR_UPLOAD_PERIOD:
+                logger.info("Our descriptor for instance %s.onion "
+                            "was received too long ago (%s)."
                             "The instance may be offline. Its introduction "
                             "points will not be included in the master "
-                            "descriptor.", instance.onion_address)
+                            "descriptor.",
+                            instance.onion_address,
+                            received_age)
+                continue
+            elif timestamp_age > (4 * 60 * 60):
+                logger.info("Our descriptor for instance %s.onion "
+                            "has an old timestamp (%s)."
+                            "The instance may be offline. Its introduction "
+                            "points will not be included in the master "
+                            "descriptor.",
+                            instance.onion_address,
+                            timestamp_age)
                 continue
             else:
                 # Include this instance's introduction points
