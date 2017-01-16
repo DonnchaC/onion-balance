@@ -226,8 +226,8 @@ class Service(object):
 
         while True:
             try:
-                descriptor.upload_descriptor(self.controller, signed_descriptor,
-                                             hsdirs=hsdirs)
+                descriptor.upload_descriptor(self.controller,
+                                             signed_descriptor, hsdirs=hsdirs)
                 break
             except stem.SocketClosed:
                 logger.error("Error uploading descriptor for service "
