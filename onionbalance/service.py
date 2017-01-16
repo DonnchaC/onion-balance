@@ -219,18 +219,24 @@ class Service(object):
     def _upload_descriptor(self, signed_descriptor, replica, hsdirs=None):
         """
         Convenience method to upload a descriptor
-
         Handle some error checking and logging inside the Service class
         """
         if hsdirs and not isinstance(hsdirs, list):
             hsdirs = [hsdirs]
 
-        try:
-            descriptor.upload_descriptor(self.controller, signed_descriptor,
-                                         hsdirs=hsdirs)
-        except stem.ControllerError:
-            logger.exception("Error uploading descriptor for service "
-                             "%s.onion.", self.onion_address)
+        while True:
+            try:
+                descriptor.upload_descriptor(self.controller, signed_descriptor,
+                                             hsdirs=hsdirs)
+                break
+            except stem.SocketClosed:
+                logger.error("Error uploading descriptor for service "
+                                 "%s.onion, Socket is closed.", self.onion_address)
+                util.reauthenticate(self.controller, logger)
+            except stem.ControllerError:
+                logger.exception("Error uploading descriptor for service "
+                                 "%s.onion.", self.onion_address)
+                break
 
     def descriptor_publish(self, force_publish=False):
         """

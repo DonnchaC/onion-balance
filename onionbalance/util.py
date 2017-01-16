@@ -6,9 +6,13 @@ import getpass
 import base64
 import binascii
 import os
+import stem
+import time
 
 # import Crypto.Util
 import Crypto.PublicKey
+
+from onionbalance import config
 
 
 def add_pkcs1_padding(message):
@@ -160,3 +164,15 @@ def is_directory_empty(path):
         return False
     else:
         return True
+
+
+def reauthenticate(controller,logger):
+    """
+    Tries to authenticate to the controller 
+    """
+    time.sleep(10)
+    try: 
+        controller.authenticate(password=config.TOR_CONTROL_PASSWORD)
+    except stem.connection.AuthenticationFailure:
+        logger.error("Failed to re-authenticate controller.")
+        
