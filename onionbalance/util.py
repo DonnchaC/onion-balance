@@ -166,13 +166,12 @@ def is_directory_empty(path):
         return True
 
 
-def reauthenticate(controller,logger):
+def reauthenticate(controller, logger):
     """
-    Tries to authenticate to the controller 
+    Tries to authenticate to the controller
     """
     time.sleep(10)
-    try: 
+    try:
         controller.authenticate(password=config.TOR_CONTROL_PASSWORD)
     except stem.connection.AuthenticationFailure:
         logger.error("Failed to re-authenticate controller.")
-        

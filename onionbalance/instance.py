@@ -28,7 +28,7 @@ def fetch_instance_descriptors(controller):
         except stem.SocketClosed:
             logger.error("Failed to send NEWNYM signal, socket is closed.")
             util.reauthenticate(controller, logger)
-   
+
     for service in config.services:
         for instance in service.instances:
             while True:
@@ -36,7 +36,8 @@ def fetch_instance_descriptors(controller):
                     instance.fetch_descriptor()
                     break
                 except stem.SocketClosed:
-                    logger.error("Failed to fecth descriptor, socket is closed")
+                    logger.error(
+                        "Failed to fecth descriptor, socket is closed")
                     util.reauthenticate(controller, logger)
 
 

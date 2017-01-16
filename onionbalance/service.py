@@ -231,7 +231,8 @@ class Service(object):
                 break
             except stem.SocketClosed:
                 logger.error("Error uploading descriptor for service "
-                                 "%s.onion, Socket is closed.", self.onion_address)
+                             "%s.onion, Socket is closed.",
+                             self.onion_address)
                 util.reauthenticate(self.controller, logger)
             except stem.ControllerError:
                 logger.exception("Error uploading descriptor for service "
