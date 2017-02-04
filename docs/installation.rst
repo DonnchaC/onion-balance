@@ -30,6 +30,18 @@ with the following command:
 
    # apt-get install onionbalance
 
+There is also a python 3 based package available in Fedora >= 25:
+
+.. code-block:: console
+
+   # yum install python3-onionbalance
+
+For CentOS or RedHat 7 there is a python 2 based package available in
+the EPEL Repository:
+
+.. code-block:: console
+
+   # yum install python2-onionbalance
 
 All tagged releases on Github or PyPi are signed with my GPG key:
 
