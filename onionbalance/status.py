@@ -6,6 +6,7 @@ Default path: /var/run/onionbalance/control
 import os
 import errno
 import threading
+import socket
 from socketserver import BaseRequestHandler, ThreadingMixIn, UnixStreamServer
 
 from onionbalance import log
@@ -82,9 +83,10 @@ class StatusSocket(object):
             server_thread.daemon = True  # Exit daemon when main thread stops
             server_thread.start()
 
-        except OSError:
-            logger.error("Could not start status socket at %s. Do you have "
-                         "permission?", status_socket_location)
+        except (OSError, socket.error):
+            logger.error("Could not start status socket at %s. Does the path "
+                         "exist? Do you have permission?",
+                         status_socket_location)
 
     def cleanup_socket_file(self):
         """
