@@ -23,8 +23,8 @@ or
     $ cd onionbalance
     # python setup.py install
 
-If you are running Debian unstable or testing, you can install OnionBalance
-with the following command:
+If you are running Debian Jessie (with backports enabled) or later you
+can install OnionBalance with the following command:
 
 .. code-block:: console
 
