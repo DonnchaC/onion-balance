@@ -25,7 +25,9 @@ Installation and usage documentation is available at https://onionbalance.readth
 Contact
 -------
 
-This software is under active development and likely contains many bugs. Please open bugs on Github if you discover any issues with the software or documentation.
+This software is under active development and likely contains many bugs. Please
+open bugs reports on Github if you discover any issues with the software or
+documentation.
 
 I can also be contacted by PGP email or on IRC at ``#onionbalance`` on the OFTC network.
 
