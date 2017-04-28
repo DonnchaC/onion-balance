@@ -10,7 +10,7 @@ servers and multiple backend application servers.
 Architecture
 ------------
 
-The management server runs the OnionBalance daemon. OnionBalance combines the routing information (the introduction points) for multiple backend onion services instances and publishes this information in a master descriptor..
+The management server runs the OnionBalance daemon. OnionBalance combines the routing information (the introduction points) for multiple backend onion services instances and publishes this information in a master descriptor.
 
 .. image:: ../onionbalance.png
 
