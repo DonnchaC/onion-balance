@@ -208,8 +208,8 @@ UNIX_TIMESTAMP = 1435233021
     ([10, 10], 10),
     ([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3], 10),
     ([10, 10, 10, 10, 10, 10], 10),
-    pytest.mark.xfail(([0, 3, 3], 10)),
-    pytest.mark.xfail(([6, 3, 3], 12)),
+    pytest.param([0, 3, 3], 10, marks=pytest.mark.xfail()),
+    pytest.param([6, 3, 3], 12, marks=pytest.mark.xfail()),
 ])
 def test_introduction_point_selection(intro_point_distribution,
                                       selected_ip_count):
