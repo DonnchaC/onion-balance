@@ -47,6 +47,13 @@ def parse_config_file(config_file):
         if not os.path.isabs(service.get('key')):
             service['key'] = os.path.join(config_directory, service['key'])
 
+        service.setdefault('health_check', {})
+        # Do not run health checks by default
+        service['health_check'].setdefault('type', None)
+        service['health_check'].setdefault('port', 80)
+        service['health_check'].setdefault('path', '/')
+        service['health_check'].setdefault('timeout', 15)
+
     return config_data
 
 
@@ -106,7 +113,8 @@ def initialize_services(controller, services_config):
         config.services.append(onionbalance.service.Service(
             controller=controller,
             service_key=service_key,
-            instances=instances
+            instances=instances,
+            health_check_conf=service['health_check']
         ))
 
         # Store a global reference to current controller connection

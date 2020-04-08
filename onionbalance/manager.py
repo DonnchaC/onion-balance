@@ -62,6 +62,14 @@ def parse_cmd_args():
     return parser
 
 
+def check_global_health():
+    """Run a health check across all instances under all services
+    """
+    for s in config.services:
+        s.check_health()
+    logger.debug("Health checks completed")
+
+
 def main():
     """
     Entry point when invoked over the command line.
@@ -115,7 +123,7 @@ def main():
         logger.debug("Successfully authenticated on the Tor control "
                      "connection.")
 
-    status_socket = status.StatusSocket(config.STATUS_SOCKET_LOCATION)
+    status_socket = status.StatusSocket(config)
     eventhandler.SignalHandler(controller, status_socket)
 
     # Disable no-member due to bug with "Instance of 'Enum' has no * member"
@@ -147,6 +155,7 @@ def main():
     scheduler.add_job(config.REFRESH_INTERVAL, fetch_instance_descriptors,
                       controller)
     scheduler.add_job(config.PUBLISH_CHECK_INTERVAL, publish_all_descriptors)
+    scheduler.add_job(config.HEALTH_CHECK_INTERVAL, check_global_health)
 
     # Run initial fetch of HS instance descriptors
     scheduler.run_all(delay_seconds=config.INITIAL_DELAY)

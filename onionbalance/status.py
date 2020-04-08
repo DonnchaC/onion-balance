@@ -1,8 +1,14 @@
 # -*- coding: utf-8 -*-
+# OnionBalance - Status
+# Copyright: 2015 Federico Ceratto
+# Released under GPLv3, see COPYING file
+
 """
 Provide status over Unix socket
 Default path: /var/run/onionbalance/control
 """
+
+from datetime import datetime
 import os
 import errno
 import threading
@@ -19,7 +25,7 @@ class StatusSocketHandler(BaseRequestHandler):
     """
     Handler for new domain socket connections
     """
-    def handle(self):
+    def send_status(self):
         """
         Prepare and output the status summary when a connection is received
         """
@@ -33,6 +39,7 @@ class StatusSocketHandler(BaseRequestHandler):
             response.append("{}.onion {}".format(service.onion_address,
                                                  service_timestamp))
 
+            healthcheck = service.health_check_conf['type'] != None
             for instance in service.instances:
                 if not instance.timestamp:
                     response.append("  {}.onion [offline]".format(
@@ -42,8 +49,26 @@ class StatusSocketHandler(BaseRequestHandler):
                         instance.onion_address,
                         instance.timestamp.strftime(time_format),
                         len(instance.introduction_points)))
+
+                if healthcheck:
+                    if instance.is_healthy:
+                        ts = datetime.fromtimestamp(instance.last_check_time)
+                        ts = ts.strftime('%H:%M:%S')
+                        response[-1] += " [up at %s]" % ts
+                    elif instance.is_healthy == False:
+                        ts = datetime.fromtimestamp(instance.last_check_time)
+                        ts = ts.strftime('%H:%M:%S')
+                        response[-1] += " [down at %s]" % ts
+                    # if is_healthy == None, show nothing
+
         response.append("")
         self.request.sendall('\n'.join(response).encode('utf-8'))
+
+    def handle(self):
+        try:
+            self.send_status()
+        except Exception as e:
+            logger.warning("Error returning status: %s" % e, exc_info=True)
 
 
 class ThreadingSocketServer(ThreadingMixIn, UnixStreamServer):
@@ -59,7 +84,7 @@ class StatusSocket(object):
     status when a client connects.
     """
 
-    def __init__(self, status_socket_location):
+    def __init__(self, config):
         """
         Create the Unix domain socket status server and start in a thread
 
@@ -70,7 +95,7 @@ class StatusSocket(object):
               r523s7jx65ckitf4.onion [offline]
               v2q7ujuleky7odph.onion 2016-05-01 11:00:00 3 IPs
         """
-        self.unix_socket_filename = status_socket_location
+        self.unix_socket_filename = config.STATUS_SOCKET_LOCATION
         self.cleanup_socket_file()
 
         logger.debug("Creating status socket at %s", self.unix_socket_filename)

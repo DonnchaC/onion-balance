@@ -35,7 +35,8 @@ class Service(object):
     be load-balanced.
     """
 
-    def __init__(self, controller, service_key=None, instances=None):
+    def __init__(self, controller, service_key=None, instances=None,
+                 health_check_conf=None):
         """
         Initialise a HiddenService object.
         """
@@ -58,6 +59,9 @@ class Service(object):
         # Timestamp when this descriptor was last attempted
         self.uploaded = None
 
+        # Health checking configuration
+        self.health_check_conf = health_check_conf
+
     def _intro_points_modified(self):
         """
         Check if the introduction point set has changed since last
@@ -65,6 +69,18 @@ class Service(object):
         """
         return any(instance.changed_since_published
                    for instance in self.instances)
+
+    def _instances_health_has_changed(self):
+        """
+        Check if the health status of any instance has changed and reset the
+        change flag.
+        """
+        changed = False
+        for i in self.instances:
+            changed = changed or i.health_changed
+            i.health_changed = False
+
+        return changed
 
     def _descriptor_not_uploaded_recently(self):
         """
@@ -102,11 +118,18 @@ class Service(object):
         """
         available_intro_points = []
 
+        # TODO: add fail-open threshold on instance health
+
         # Loop through each instance and determine fresh intro points
         for instance in self.instances:
             if not instance.received:
                 logger.info("No descriptor received for instance %s.onion "
                             "yet.", instance.onion_address)
+                continue
+
+            if not instance.is_healthy:
+                logger.debug("Skipping unhealthy instance %s.onion",
+                             instance.onion_address)
                 continue
 
             # The instance may be offline if no descriptor has been received
@@ -260,6 +283,7 @@ class Service(object):
         # are True
         if any([self._intro_points_modified(),  # If any IPs have changed
                 self._descriptor_not_uploaded_recently(),
+                self._instances_health_has_changed(),
                 force_publish]):
 
             logger.debug("Publishing a descriptor for service %s.onion.",
@@ -276,3 +300,12 @@ class Service(object):
         else:
             logger.debug("Not publishing a new descriptor for service "
                          "%s.onion.", self.onion_address)
+
+    def check_health(self):
+        """Check health of every instance in this service
+        """
+        for i in self.instances:
+            try:
+                i.check_health(self.health_check_conf)
+            except Exception as e:
+                logger.error("Unexpected error: %s" % e, exc_info=True)
