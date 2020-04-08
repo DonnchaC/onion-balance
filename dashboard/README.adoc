@@ -1,0 +1,17 @@
+
+OnionBalance web dashboard
+
+Requires the Bottle web framework and Python3
+
+The dashboard needs to be run on the same host running OnionBalance
+and have read+write permissions to /var/run/onionbalance/control
+
+On Debian:
+
+$ sudo apt-get install python3-bottle
+
+$ ./dashboard.py -h
+
+Set the template path if needed.
+
+
